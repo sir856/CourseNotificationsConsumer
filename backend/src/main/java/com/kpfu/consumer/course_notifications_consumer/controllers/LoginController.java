@@ -7,7 +7,12 @@ import com.kpfu.consumer.course_notifications_consumer.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/login")
@@ -26,22 +31,26 @@ public class LoginController {
 
     @PostMapping
     public User register(@RequestBody User user) {
-        if (usersRepository.findById(user.getName()).isPresent()) {
+        if (usersRepository.findByName(user.getName()).isPresent()) {
             throw new IllegalArgumentException("User with name: " + user.getName() + " already exists");
         }
         return usersRepository.save(user);
     }
 
     @PutMapping
-    public String login(@RequestBody User data, @RequestHeader("cookie") String cookies) {
+    public Map<String, String> login(@RequestBody User data, @RequestHeader("cookie") String cookies) {
         String session = Utils.getSessionFromCookies(cookies);
 
-        User user = usersRepository.findById(data.getName()).orElseThrow(() -> new IllegalArgumentException("Wrong name"));
+        User user = usersRepository.findByName(data.getName()).orElseThrow(() -> new IllegalArgumentException("Wrong name"));
 
         if (user.getPassword().equals(data.getPassword())) {
             String token = TokenComponent.generateNewToken();
-            tokenComponent.addUserToken(user.getName(), token, session);
-            return token;
+            tokenComponent.addUserToken(user.getId(), token, session);
+
+            Map<String, String> body = new HashMap<>();
+            body.put("token", token);
+            body.put("userId", String.valueOf(user.getId()));
+            return body;
         }
 
         throw new IllegalArgumentException("Wrong password");

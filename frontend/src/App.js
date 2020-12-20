@@ -33,13 +33,13 @@ function App() {
                 if (response.status === 200) {
                     setError(null);
                     const readMessage = value => {
-                        localStorage.setItem("token", value);
-                        localStorage.setItem("id", userData.name);
+                        localStorage.setItem("token", value.token);
+                        localStorage.setItem("id", value.id);
                         setToken(value);
                         setId(userData.name);
                         setLoggedIn(true);
                     };
-                    response.text().then(readMessage);
+                    response.json().then(readMessage);
                 }
                 else {
                     response.json().then(value => {

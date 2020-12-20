@@ -1,37 +1,61 @@
 package com.kpfu.consumer.course_notifications_consumer.model;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
-@Table(name = "interest")
 public class Interest {
+    @EmbeddedId
+    private InterestKey id = new InterestKey();
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "knowledge_id")
+    @MapsId("knowledgeId")
+    private Knowledge knowledge;
 
-    private String knowledge;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "tag_id")
+    @MapsId("tagId")
+    private Tag tag;
 
-    private String tag;
+    @ManyToMany(mappedBy = "interests", fetch = FetchType.LAZY)
+    private Set<User> users;
 
-    @ManyToMany
-    private
-    List<User> users;
-
-    public int getId() {
+    public InterestKey getId() {
         return id;
     }
 
-    public String getKnowledge() {
+    public Knowledge getKnowledge() {
         return knowledge;
     }
 
-    public String getTag() {
+    public Tag getTag() {
         return tag;
     }
 
-    public List<User> getUsers() {
+    public Set<User> getUsers() {
         return users;
+    }
+
+    public void setKnowledge(Knowledge knowledge) {
+        this.knowledge = knowledge;
+    }
+
+    public void setTag(Tag tag) {
+        this.tag = tag;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Interest interest = (Interest) o;
+        return id.equals(interest.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
