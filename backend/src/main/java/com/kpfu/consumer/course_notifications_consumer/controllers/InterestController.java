@@ -2,6 +2,7 @@ package com.kpfu.consumer.course_notifications_consumer.controllers;
 
 import com.kpfu.consumer.course_notifications_consumer.model.Interest;
 import com.kpfu.consumer.course_notifications_consumer.model.Knowledge;
+import com.kpfu.consumer.course_notifications_consumer.model.Notification;
 import com.kpfu.consumer.course_notifications_consumer.model.Tag;
 import com.kpfu.consumer.course_notifications_consumer.repositories.InterestsRepository;
 import com.kpfu.consumer.course_notifications_consumer.repositories.KnowledgeRepository;
@@ -9,6 +10,7 @@ import com.kpfu.consumer.course_notifications_consumer.repositories.TagsReposito
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -24,11 +26,14 @@ public class InterestController {
 
     private final InterestsRepository interestsRepository;
 
+    private final SimpMessagingTemplate template;
+
     @Autowired
-    public InterestController(KnowledgeRepository knowledgeRepository, TagsRepository tagsRepository, InterestsRepository interestsRepository) {
+    public InterestController(KnowledgeRepository knowledgeRepository, TagsRepository tagsRepository, InterestsRepository interestsRepository, SimpMessagingTemplate template) {
         this.knowledgeRepository = knowledgeRepository;
         this.tagsRepository = tagsRepository;
         this.interestsRepository = interestsRepository;
+        this.template = template;
     }
 
     @PostMapping("/knowledge/add")
@@ -101,5 +106,12 @@ public class InterestController {
         }
 
         return knowledgeJsonArray.toString();
+    }
+
+    @PutMapping("/notification")
+    public Notification notification(@RequestBody Notification notification) {
+        template.convertAndSend("/course/notification", notification);
+
+        return notification;
     }
 }

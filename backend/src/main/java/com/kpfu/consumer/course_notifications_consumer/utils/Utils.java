@@ -28,11 +28,9 @@ public class Utils {
 
     public static JSONObject getUserJson(User user) {
         JSONObject userJson = new JSONObject();
-
-        userJson.put("id", user.getId());
-        userJson.put("name", user.getName());
-
         JSONArray interestsJsonArray = new JSONArray();
+
+        userJson.put("id", user.getId()).put("name", user.getName());
 
         Map<Knowledge, Set<Tag>> interestsMap = new HashMap<>();
 
@@ -48,8 +46,7 @@ public class Utils {
             JSONObject knowledgeJson = new JSONObject();
             JSONArray tagsJsonArray = new JSONArray();
 
-            knowledgeJson.put("id", knowledge.getId());
-            knowledgeJson.put("name", knowledge.getName());
+            knowledgeJson.put("id", knowledge.getId()).put("name", knowledge.getName());
 
             for (Tag tag : interestsMap.get(knowledge)) {
                 JSONObject tagJson = new JSONObject();
