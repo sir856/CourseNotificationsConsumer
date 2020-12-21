@@ -1,6 +1,6 @@
 import {AuthContext} from '../../context/AuthContext';
 import React from 'react';
-import { Card, Form, Input, Button, Error } from "./AuthForm";
+import { Error } from "./AuthForm";
 
 export default class ErrorClass extends React.Component {
     render() {

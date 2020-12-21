@@ -1,18 +1,20 @@
 package com.kpfu.consumer.course_notifications_consumer.controllers;
 
 import com.kpfu.consumer.course_notifications_consumer.components.TokenComponent;
-import com.kpfu.consumer.course_notifications_consumer.model.Interest;
-import com.kpfu.consumer.course_notifications_consumer.model.InterestKey;
-import com.kpfu.consumer.course_notifications_consumer.model.User;
+import com.kpfu.consumer.course_notifications_consumer.model.*;
 import com.kpfu.consumer.course_notifications_consumer.repositories.InterestsRepository;
 import com.kpfu.consumer.course_notifications_consumer.repositories.UsersRepository;
 import com.kpfu.consumer.course_notifications_consumer.utils.Utils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -34,18 +36,20 @@ public class UserController {
     }
 
 
-    @GetMapping("/info/{id}")
-    public User getInfo(@PathVariable("id") int id, @RequestHeader("token") String token, @RequestHeader("cookie") String cookies) {
+    @GetMapping(value = "/info/{id}", produces = "application/json")
+    public String getInfo(@PathVariable("id") int id, @RequestHeader("token") String token, @RequestHeader("cookie") String cookies) {
         String session = Utils.getSessionFromCookies(cookies);
         if (tokenComponent.getToken(id).equals(token + session)) {
-            return usersRepository.findById(id).orElse(null);
+            User user = usersRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Wrong user id"));
+
+            return Utils.getUserJson(user).toString();
         }
 
         throw new IllegalArgumentException("Wrong token");
     }
 
-    @PutMapping("/interests/add/{id}")
-    public User setInterests(@PathVariable("id") int id,
+    @PutMapping(value = "/interests/add/{id}", produces = "application/json")
+    public String setInterests(@PathVariable("id") int id,
                              @RequestHeader("token") String token,
                              @RequestHeader("cookie") String cookies,
                              @RequestBody Set<InterestKey> interestsId) {
@@ -62,7 +66,9 @@ public class UserController {
 
             user.setInterests(interests);
 
-            return usersRepository.save(user);
+            usersRepository.save(user);
+
+            return Utils.getUserJson(user).toString();
         }
 
         throw new IllegalArgumentException("Wrong token");

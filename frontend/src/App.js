@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import Home from './components/authentication/Home'
 import Login from './components/authentication/Login'
@@ -6,7 +5,8 @@ import UserInfo from './components/user/UserInfo'
 import SignUp from './components/authentication/SignUp'
 import {AuthContext} from './context/AuthContext';
 import { BrowserRouter as Router, Link, Route } from "react-router-dom";
-import {useState, useEffect} from "react";
+import {useState} from "react";
+import ManageInterests from "./components/user/ManageInterests";
 
 function App() {
     const [token, setToken] = useState(localStorage.getItem("token"));
@@ -29,14 +29,14 @@ function App() {
             body: JSON.stringify(userData) // body data type must match "Content-Type" header
         })
             .then((response) => {
-                console.log(response);
                 if (response.status === 200) {
                     setError(null);
                     const readMessage = value => {
+                        console.log(value);
                         localStorage.setItem("token", value.token);
-                        localStorage.setItem("id", value.id);
-                        setToken(value);
-                        setId(userData.name);
+                        localStorage.setItem("id", value.userId);
+                        setToken(value.token);
+                        setId(value.userId);
                         setLoggedIn(true);
                     };
                     response.json().then(readMessage);
@@ -131,11 +131,6 @@ function App() {
             });
     };
 
-    console.log(isLoggedIn);
-    console.log(id);
-    console.log(token);
-    console.log(userInfo);
-
     return (
       <AuthContext.Provider value={{
           isLoggedIn: isLoggedIn,
@@ -162,6 +157,7 @@ function App() {
                   <Route path="/login" component={Login} />
                   <Route path="/user" component={UserInfo} />
                   <Route path="/signup" component={SignUp} />
+                  <Route path="/user/interests/manage" component={ManageInterests} />
               </div>
           </Router>
       </AuthContext.Provider>

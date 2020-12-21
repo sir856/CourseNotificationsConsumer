@@ -15,6 +15,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/interest")
+@CrossOrigin
 public class InterestController {
 
     private final KnowledgeRepository knowledgeRepository;

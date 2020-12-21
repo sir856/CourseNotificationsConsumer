@@ -1,8 +1,8 @@
 import {AuthContext} from '../../context/AuthContext';
 import React from 'react';
 import {Redirect } from "react-router-dom";
-import { Card, Form, Input, Button, Error } from "./AuthForm";
-import { BrowserRouter as Router, Link, Route } from "react-router-dom";
+import { Card, Form, Input, Button} from "./AuthForm";
+import {Link} from "react-router-dom";
 import ErrorClass from "./ErrorClass";
 
 export default class Login extends React.Component {

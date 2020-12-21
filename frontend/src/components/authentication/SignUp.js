@@ -1,18 +1,18 @@
 import {AuthContext} from '../../context/AuthContext';
 import {Redirect } from "react-router-dom";
 import ErrorClass from './ErrorClass'
-import { Card, Form, Input, Button, Error } from "./AuthForm";
-import { BrowserRouter as Router, Link, Route } from "react-router-dom";
+import { Card, Form, Input, Button} from "./AuthForm";
+import { Link } from "react-router-dom";
 import React from 'react';
 
 export default class SignUp extends React.Component {
-    componentDidMount() {
+    componentWillMount() {
         this.setState({
                 userData: {
                     name: "",
                     password: "",
                 },
-                isError: ""
+                registration: false
             }
         )
     }
@@ -44,7 +44,10 @@ export default class SignUp extends React.Component {
     register(e) {
         e.preventDefault();
         if (this.state.userData.password === this.state.passAgain) {
-            this.context.register(this.state.userData)
+            this.context.register(this.state.userData);
+            this.setState({
+                registration: true
+            })
         }
         else {
             this.context.isError = "Passwords don't match"
@@ -60,6 +63,9 @@ export default class SignUp extends React.Component {
             return <Redirect to="/user"/>
         }
         else {
+            if (this.state.registration && this.context.isError == null) {
+                return <Redirect to="/login"/>
+            }
             return (
                 <Card>
                     <Form>
