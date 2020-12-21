@@ -5,13 +5,18 @@ import com.kpfu.consumer.course_notifications_consumer.model.*;
 import com.kpfu.consumer.course_notifications_consumer.repositories.InterestsRepository;
 import com.kpfu.consumer.course_notifications_consumer.repositories.UsersRepository;
 import com.kpfu.consumer.course_notifications_consumer.utils.Utils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 @RestController
@@ -64,6 +69,13 @@ public class UserController {
 
             usersRepository.save(user);
 
+            RestTemplate restTemplate = new RestTemplate();
+            MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+            headers.put("Content-Type", Arrays.asList("application/json"));
+            HttpEntity<String>  request = new HttpEntity<>(Utils.getUserSubscriptionsJson(user).toString(), headers);
+            ResponseEntity<String> response = restTemplate.postForEntity("http://10.160.178.168/subscriptions/subscript", request, String.class);
+            logger.info("response code: " +  response.getStatusCodeValue());
+            logger.info(response.getBody());
             return Utils.getUserJson(user).toString();
         }
 
