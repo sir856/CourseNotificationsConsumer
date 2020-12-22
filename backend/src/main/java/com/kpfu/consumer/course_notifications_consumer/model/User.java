@@ -2,6 +2,7 @@ package com.kpfu.consumer.course_notifications_consumer.model;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -23,6 +24,9 @@ public class User {
     )
     private Set<Interest> interests = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Set<UserNotification> notifications;
+
     public int getId() {
         return id;
     }
@@ -41,5 +45,9 @@ public class User {
 
     public void setInterests(Set<Interest> interests) {
         this.interests = interests;
+    }
+
+    public Set<UserNotification> getNotifications() {
+        return notifications;
     }
 }

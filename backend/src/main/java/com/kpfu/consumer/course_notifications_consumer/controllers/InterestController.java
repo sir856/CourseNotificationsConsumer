@@ -1,12 +1,8 @@
 package com.kpfu.consumer.course_notifications_consumer.controllers;
 
-import com.kpfu.consumer.course_notifications_consumer.model.Interest;
-import com.kpfu.consumer.course_notifications_consumer.model.Knowledge;
-import com.kpfu.consumer.course_notifications_consumer.model.Notification;
-import com.kpfu.consumer.course_notifications_consumer.model.Tag;
-import com.kpfu.consumer.course_notifications_consumer.repositories.InterestsRepository;
-import com.kpfu.consumer.course_notifications_consumer.repositories.KnowledgeRepository;
-import com.kpfu.consumer.course_notifications_consumer.repositories.TagsRepository;
+import com.kpfu.consumer.course_notifications_consumer.model.*;
+import com.kpfu.consumer.course_notifications_consumer.repositories.*;
+import com.kpfu.consumer.course_notifications_consumer.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +17,25 @@ import java.util.*;
 public class InterestController {
 
     private final KnowledgeRepository knowledgeRepository;
-
     private final TagsRepository tagsRepository;
-
     private final InterestsRepository interestsRepository;
-
     private final SimpMessagingTemplate template;
+    private final UserNotificationsRepository notificationsRepository;
+    private final UsersRepository usersRepository;
 
     @Autowired
-    public InterestController(KnowledgeRepository knowledgeRepository, TagsRepository tagsRepository, InterestsRepository interestsRepository, SimpMessagingTemplate template) {
+    public InterestController(KnowledgeRepository knowledgeRepository,
+                              TagsRepository tagsRepository,
+                              InterestsRepository interestsRepository,
+                              SimpMessagingTemplate template,
+                              UserNotificationsRepository notificationsRepository,
+                              UsersRepository usersRepository) {
         this.knowledgeRepository = knowledgeRepository;
         this.tagsRepository = tagsRepository;
         this.interestsRepository = interestsRepository;
         this.template = template;
+        this.notificationsRepository = notificationsRepository;
+        this.usersRepository = usersRepository;
     }
 
     @PostMapping("/knowledge/add")
@@ -108,10 +110,42 @@ public class InterestController {
         return knowledgeJsonArray.toString();
     }
 
-    @PutMapping("/notification")
-    public Notification notification(@RequestBody Notification notification) {
-        template.convertAndSend("/course/notification", notification);
+    @PutMapping(value = "/notification", produces = "application/json")
+    public String notification(@RequestBody String notification) {
+        JSONObject notificationJson = new JSONObject(notification);
 
-        return notification;
+        UserNotification userNotification = new UserNotification();
+        userNotification.setId(notificationJson.getInt("userId")+ "_" + notificationJson.getJSONObject("message").getInt("id"));
+
+        User user = usersRepository.findById(notificationJson.getInt("userId"))
+                .orElseThrow(() -> new IllegalArgumentException("Wrong user id: " + notificationJson.getInt("userId")));
+
+        for (Object knowledgeObj : notificationJson.getJSONObject("message").getJSONArray("tags")) {
+            JSONObject knowledgeJson = (JSONObject) knowledgeObj;
+
+            int knowledgeId = knowledgeJson.getInt("knowledge");
+            Knowledge knowledge = knowledgeRepository.findById(knowledgeId).orElseThrow(() -> new IllegalArgumentException("Wrong knowledge id: " + knowledgeId));
+
+            knowledgeJson.put("knowledge", knowledge.getName());
+
+            JSONArray tagsArray = new JSONArray();
+
+            for (Object tagObj : knowledgeJson.getJSONArray("tags")) {
+                Integer tagId = (Integer) tagObj;
+
+                Tag tag = tagsRepository.findById(tagId).orElseThrow(() -> new IllegalArgumentException("Wrong tag id: " + tagId));
+
+                tagsArray.put(tag.getName());
+            }
+
+            knowledgeJson.put("tags", tagsArray);
+        }
+
+        userNotification.setMessage(notificationJson.toString());
+        userNotification.setUser(user);
+
+        template.convertAndSend("/course/notification", userNotification.getMessage());
+
+        return Utils.getUserNotificationJson(notificationsRepository.save(userNotification)).toString();
     }
 }

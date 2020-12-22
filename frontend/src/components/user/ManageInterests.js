@@ -1,7 +1,7 @@
 import React from 'react';
 import {AuthContext} from '../../context/AuthContext';
 import styled from 'styled-components';
-import ErrorClass from "../authentication/ErrorClass";
+import ErrorClass from "./ErrorClass";
 import {Redirect } from "react-router-dom";
 import OkClass from "./OkClass";
 
@@ -12,23 +12,52 @@ export default class ManageInterests extends React.Component {
             saved: null
         });
         this.getData();
-
-        if (this.context.info) {
-            let selected = [];
-            this.context.info.interests.forEach((knowledge, index, array) => {
-                knowledge.tags.forEach((tag, index, array) => {
-                    console.log(knowledge);
-                    console.log(tag);
-
-                    selected.push({knowledgeId: knowledge.id, tagId: tag.id});
-                })
-            });
-
-            this.setState({
-                selected: selected
-            });
-        }
+        this.getInfo();
     };
+
+    getInfo() {
+        fetch("http://localhost:8080/user/info/" + this.context.id, {
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'include', // include, *same-origin, omit
+            headers: {
+                'token': this.context.token
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            referrerPolicy: 'no-referrer', // no-referrer, *client
+        })
+            .then((response) => {
+                if (response.status === 200) {
+                    response.json().then(value => {
+                        let selected = [];
+                        value.interests.forEach((knowledge, index, array) => {
+                            knowledge.tags.forEach((tag, index, array) => {
+                                selected.push({knowledgeId: knowledge.id, tagId: tag.id});
+                            })
+                        });
+
+                        this.setState({
+                            selected: selected
+                        });
+                    })
+                }
+                else {
+                    response.json().then(value => {
+                        this.setState({
+                                error: value.message
+                            }
+                        )
+                    })
+                }
+            })
+            .catch((error) => {
+                this.setState({
+                        error: error.toString()
+                    }
+                )
+            });
+    }
 
     getData() {
         fetch("http://localhost:8080/interest/knowledge", {
@@ -184,9 +213,9 @@ export default class ManageInterests extends React.Component {
     }
 
     save() {
-        if (this.state.selected.length === 0) {
-            return;
-        }
+        this.setState({
+            loading: "Loading..."
+        });
         fetch("http://localhost:8080/user/interests/add/" + this.context.id, {
             method: 'PUT', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
@@ -202,39 +231,49 @@ export default class ManageInterests extends React.Component {
         })
             .then((response) => {
                 if (response.status === 200) {
-                    this.context.isError = null;
                     this.setState({
-                            saved: "Saved"
+                            saved: "Saved",
+                            loading: null
                         }
-                    )
+                    );
+
                 }
                 else {
                     response.json().then(value => {
-                        this.context.isError = value.message;
+                        this.setState({
+                                saved: null,
+                                error: value.error,
+                                loading: null
+                            }
+                        )
                     });
-                    this.setState({
-                            saved: null
-                        }
-                    )
+
                 }
             })
             .catch((error) => {
-                this.context.isError = error.toString();
+                console.log(error);
                 this.setState({
-                        saved: null
+                        saved: null,
+                        error: error.toString(),
+                        loading: null
                     }
                 )
             });
     }
 
     render() {
-        if (!this.context.info) {
+        if (!this.context.isLoggedIn) {
+            return <Redirect to="/login"/>
+        }
+        if (!this.props.location.state) {
             return <Redirect to="/user"/>
         }
         if (this.state.interests) {
             const knowledgeOptions = this.getKnowledge();
             const interests = this.getInterests();
             const saved = this.state.saved;
+            const error = this.state.error;
+            const loading = this.state.loading;
 
             return (
                 <div>
@@ -251,9 +290,10 @@ export default class ManageInterests extends React.Component {
                     </div>
                     <button onClick={this.addInterest.bind(this)}>add</button>
                     <button onClick={this.save.bind(this)}>save</button>
+                    <div>{loading}</div>
                     <div id="selected">{interests}</div>
-                    <ErrorClass/>
                     <OkClass message={saved}/>
+                    <ErrorClass message={error}/>
                 </div>
             )
         }

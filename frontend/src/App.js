@@ -6,6 +6,7 @@ import SignUp from './components/authentication/SignUp'
 import {AuthContext} from './context/AuthContext';
 import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 import {useState} from "react";
+import {useCookies} from 'react-cookie';
 import ManageInterests from "./components/user/ManageInterests";
 
 function App() {
@@ -14,6 +15,13 @@ function App() {
     const [id, setId] = useState(localStorage.getItem("id"));
     const [userInfo, setInfo] = useState(null);
     const [isLoggedIn, setLoggedIn] = useState(token != null & id != null);
+    const [cookies, setCookies, removeCookies] = useCookies();
+
+    const random = require('crypto-random-string');
+
+    if (!cookies.sessionId) {
+        setCookies("sessionId", random({length: 20}));
+    }
 
     const login = (userData) => {
         fetch("http://localhost:8080/login", {
@@ -100,7 +108,7 @@ function App() {
     };
 
     const getUserInfo = () => {
-        fetch("http://localhost:8080/user/info/" + id, {
+        return fetch("http://localhost:8080/user/info/" + id, {
             method: 'GET', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached

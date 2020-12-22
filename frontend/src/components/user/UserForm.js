@@ -4,4 +4,8 @@ const Ok = styled.div`
   background-color: green;
 `;
 
-export {Ok};
+const Error = styled.div`
+   background-color: red;
+`;
+
+export {Ok, Error};

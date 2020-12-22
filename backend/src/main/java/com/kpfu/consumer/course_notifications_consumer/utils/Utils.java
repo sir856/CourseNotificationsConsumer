@@ -1,23 +1,18 @@
 package com.kpfu.consumer.course_notifications_consumer.utils;
 
-import com.kpfu.consumer.course_notifications_consumer.model.Interest;
-import com.kpfu.consumer.course_notifications_consumer.model.Knowledge;
-import com.kpfu.consumer.course_notifications_consumer.model.Tag;
-import com.kpfu.consumer.course_notifications_consumer.model.User;
+import com.kpfu.consumer.course_notifications_consumer.model.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import javax.management.Notification;
+import java.util.*;
 
 public class Utils {
     public static String getSessionFromCookies(String cookies) {
         String[] cookiesArray = cookies.split(";");
 
         for (String cookie : cookiesArray) {
-            if (cookie.startsWith("JSESSIONID")) {
+            if (cookie.startsWith("sessionId")) {
                 return cookie.split("=")[1];
             }
         }
@@ -53,7 +48,35 @@ public class Utils {
 
         userJson.put("interests", interestsJsonArray);
 
+        userJson.put("notifications", getUserNotificationsJson(user.getNotifications()));
+
         return userJson;
+    }
+
+    public static JSONObject getUserNotificationJson(UserNotification userNotification) {
+        JSONObject userNotificationJson = new JSONObject();
+
+        userNotificationJson.put("id", userNotification.getId());
+        userNotificationJson.put("message", userNotification.getMessage());
+        userNotificationJson.put("user", getUserJson(userNotification.getUser()));
+
+        return userNotificationJson;
+    }
+
+    private static JSONArray getUserNotificationsJson(Set<UserNotification> notifications) {
+        JSONArray notificationsJsonArray = new JSONArray();
+
+        for (UserNotification notification : notifications) {
+            JSONObject userNotificationJson = new JSONObject();
+
+            userNotificationJson.put("id", notification.getId());
+            userNotificationJson.put("message", new JSONObject(notification.getMessage()));
+
+            notificationsJsonArray.put(userNotificationJson);
+        }
+
+
+        return notificationsJsonArray;
     }
 
     public static JSONObject getUserSubscriptionsJson(User user) {

@@ -7,8 +7,6 @@ import com.kpfu.consumer.course_notifications_consumer.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -16,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/login")
-@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
+@CrossOrigin(allowCredentials = "true", origins = {"http://localhost:3000"})
 public class LoginController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UsersRepository usersRepository;
