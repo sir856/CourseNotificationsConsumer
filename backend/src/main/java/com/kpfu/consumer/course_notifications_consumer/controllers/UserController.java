@@ -69,6 +69,7 @@ public class UserController {
                         .orElseThrow(() -> new IllegalArgumentException("Wrong interest id"));
                 interests.add(interest);
             }
+            user.setInterests(interests);
 
             RestTemplate restTemplate = new RestTemplate();
             MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -79,7 +80,6 @@ public class UserController {
             logger.info(response.getBody());
 
             if (response.getStatusCodeValue() == 200) {
-                user.setInterests(interests);
                 usersRepository.save(user);
             }
             return Utils.getUserJson(user).toString();
