@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/login")
-@CrossOrigin(allowCredentials = "true", origins = {"http://localhost:3000"})
+@CrossOrigin(allowCredentials = "true", origins = {"http://167.99.254.87:3000"})
 public class LoginController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UsersRepository usersRepository;
