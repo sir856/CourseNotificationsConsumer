@@ -74,7 +74,7 @@ public class UserController {
             MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
             headers.put("Content-Type", Arrays.asList("application/json"));
             HttpEntity<String>  request = new HttpEntity<>(Utils.getUserSubscriptionsJson(user).toString(), headers);
-            ResponseEntity<String> response = restTemplate.postForEntity("http://10.160.178.168/subscriptions/subscript", request, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity("http://159.89.97.233/subscriptions/subscript", request, String.class);
             logger.info("response code: " +  response.getStatusCodeValue());
             logger.info(response.getBody());
 
