@@ -24,7 +24,7 @@ function App() {
     }
 
     const login = (userData) => {
-        fetch("http://localhost:8080/login", {
+        fetch("http://167.99.254.87:8080/login", {
             method: 'PUT', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -70,7 +70,7 @@ function App() {
             });
     };
     const register = (userData) => {
-        fetch("http://localhost:8080/login", {
+        fetch("http://167.99.254.87:8080/login", {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -108,7 +108,7 @@ function App() {
     };
 
     const getUserInfo = () => {
-        return fetch("http://localhost:8080/user/info/" + id, {
+        return fetch("http://167.99.254.87:8080/user/info/" + id, {
             method: 'GET', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached

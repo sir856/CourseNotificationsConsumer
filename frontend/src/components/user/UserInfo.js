@@ -17,7 +17,7 @@ export default class UserInfo extends React.Component {
     }
 
     getInfo() {
-        fetch("http://localhost:8080/user/info/" + this.context.id, {
+        fetch("http://167.99.254.87:8080/user/info/" + this.context.id, {
             method: 'GET', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -115,7 +115,7 @@ export default class UserInfo extends React.Component {
             }
         });
 
-        fetch("http://localhost:8080/user/notification/" + this.context.id + "?id=" + id, {
+        fetch("http://167.99.254.87:8080/user/notification/" + this.context.id + "?id=" + id, {
             method: 'DELETE', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -158,7 +158,7 @@ export default class UserInfo extends React.Component {
                         <div><b>{user.name}</b></div>
                         <button className="logout" onClick={this.logout.bind(this)}>Logout</button>
                         {notifications}
-                        <SockJsClient url = 'http://localhost:8080/notification' topics={['/course/notification']}
+                        <SockJsClient url = 'http://167.99.254.87:8080/notification' topics={['/course/notification']}
                                       onMessage={this.handleMessage.bind(this)}
                                       ref={ (client) => { this.clientRef = client }}/>
                         <ErrorClass message={this.state.error}/>

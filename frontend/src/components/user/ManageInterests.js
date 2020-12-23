@@ -16,7 +16,7 @@ export default class ManageInterests extends React.Component {
     };
 
     getInfo() {
-        fetch("http://localhost:8080/user/info/" + this.context.id, {
+        fetch("http://167.99.254.87:8080/user/info/" + this.context.id, {
             method: 'GET', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -60,7 +60,7 @@ export default class ManageInterests extends React.Component {
     }
 
     getData() {
-        fetch("http://localhost:8080/interest/knowledge", {
+        fetch("http://167.99.254.87:8080/interest/knowledge", {
             method: 'GET', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -216,7 +216,7 @@ export default class ManageInterests extends React.Component {
         this.setState({
             loading: "Loading..."
         });
-        fetch("http://localhost:8080/user/interests/add/" + this.context.id, {
+        fetch("http://167.99.254.87:8080/user/interests/add/" + this.context.id, {
             method: 'PUT', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
